@@ -1,3 +1,9 @@
+  // Hide the picture while the page is loading
+Qualtrics.SurveyEngine.addOnload(function () {
+  const image = document.getElementsByTagName('img')[0]
+  image.style.visibility = 'hidden'
+})
+
 Qualtrics.SurveyEngine.addOnReady(function() {
   // Add clicks so far
   // Select image more specifically
@@ -23,8 +29,12 @@ Qualtrics.SurveyEngine.addOnReady(function() {
 
   this.hideNextButton()
   // hide image before scaling it and only display it after?
+
+
   scaleImage(imageWidth) // scale image to initial/starting size on load
 
+  // Ok cool, the page is ready and the picture is scaled properly, so show the image
+  image.style.visibility = 'visible'
   image.style.margin = 'auto'
   image.style.display = 'block'
   imageContainer.style.minHeight = '600px'
@@ -34,7 +44,6 @@ Qualtrics.SurveyEngine.addOnReady(function() {
   // Scroll to the middle of the viewport
   var my_scroll = elem_top - (viewport_height / 2);
   jQuery(window).scrollTop(my_scroll);
-
 
   let keyPressed = false
   document.onkeydown = function(e) {
@@ -54,14 +63,19 @@ Qualtrics.SurveyEngine.addOnReady(function() {
           console.log('Only the spacebar will make the image big, big, bigger!')
         }
       } else if (isEnterPress(e)) {
-        // go to next question
-        goToNextTrial()
+        // Lock keyboard after enter is pressed
+        document.onkeydown = e => false
+        // Wait 10 seconds and then go to next tr ial
+        setTimeout(() => {
+          goToNextTrial()
+        }, 10000)
+        // Do we need to remove the handler after it's done here?
       }
     }
   }
 
   document.onkeyup = function(e) {
-    if ((isSpacebarPress(e) || isEnterPress(e)) && keyPressed) {
+    if (keyPressed) {
       keyPressed = false
     }
   }
@@ -74,6 +88,11 @@ Qualtrics.SurveyEngine.addOnReady(function() {
 // TODO: A user should not be able to cycle to new trials by holding ENTER
   // Is this actually an issue? We could use a next button if it is.
   // Alternatively, we could require an action (like focus on an element) before going forward.
+// X: After a user presses enter, the screen and keyboard should freeze for 10 seconds and then go to the next trial.
+  // TODO: Do we also need to disable mouse click events?
+  // Also, should we give the user some sort of UI update so they know something's happening?
+// TODO: Set focus on the image once page loads so that spacebar press will always enhance image
+// TODO: Only show image once page loads so you don't see it big and then small again.
 
 // FLOW
 // 1. Present instructions page
