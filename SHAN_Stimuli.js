@@ -5,15 +5,14 @@ Qualtrics.SurveyEngine.addOnload(function () {
 })
 
 Qualtrics.SurveyEngine.addOnReady(function() {
-  // Add clicks so far
-  // Select image more specifically
+  // Select image with selectors that have more specificity
   const SPACEBAR_KEYCODE = 32
   const ENTER_KEYCODE = 13
+  const FREEZE_DURATION_AFTER_ENTER_PRESS = 10000
   const possibleEnlargementClicks = 20
   const initialImageRender = 1
   // Compensate for initial image render by adding another possible click
   const imageSizeIncrement = 100 / (possibleEnlargementClicks + initialImageRender)
-  console.log('imageSizeIncrement', imageSizeIncrement)
   let clicksSoFar = 0
   let imageWidth = imageSizeIncrement // Starting size
 
@@ -29,14 +28,13 @@ Qualtrics.SurveyEngine.addOnReady(function() {
 
   this.hideNextButton()
   // hide image before scaling it and only display it after?
-
-
   scaleImage(imageWidth) // scale image to initial/starting size on load
 
   // Ok cool, the page is ready and the picture is scaled properly, so show the image
   image.style.visibility = 'visible'
   image.style.margin = 'auto'
   image.style.display = 'block'
+  image.focus()
   imageContainer.style.minHeight = '600px'
 
   var elem_top = jQuery("img").offset()['top'];
@@ -45,22 +43,21 @@ Qualtrics.SurveyEngine.addOnReady(function() {
   var my_scroll = elem_top - (viewport_height / 2);
   jQuery(window).scrollTop(my_scroll);
 
+
   let keyPressed = false
   document.onkeydown = function(e) {
     e.preventDefault()
 
-    // Ensure that
+    // Disable key repeat
     if (!keyPressed) {
       keyPressed = true
       if (isSpacebarPress(e)) {
         if (clicksSoFar <= 19) {
           clicksSoFar += 1
-          console.log('clicksSoFar', clicksSoFar)
           incrementedImageSize()
           scaleImage(imageWidth)
-          console.log('imageWidth', imageWidth)
         } else {
-          console.log('Only the spacebar will make the image big, big, bigger!')
+          // What should we do here?
         }
       } else if (isEnterPress(e)) {
         // Lock keyboard after enter is pressed
@@ -68,7 +65,7 @@ Qualtrics.SurveyEngine.addOnReady(function() {
         // Wait 10 seconds and then go to next tr ial
         setTimeout(() => {
           goToNextTrial()
-        }, 10000)
+        }, FREEZE_DURATION_AFTER_ENTER_PRESS)
         // Do we need to remove the handler after it's done here?
       }
     }
@@ -82,6 +79,9 @@ Qualtrics.SurveyEngine.addOnReady(function() {
 
 });
 
+// Set picture ID to embedded data
+// Set question number to embedded data
+
 // TODO: Automatically import images to Qualtrix questions
 // X: A user should not be able to hold spacebar
 // X: A user should be able to enhance to 20 clicks (currently 20)
@@ -91,10 +91,10 @@ Qualtrics.SurveyEngine.addOnReady(function() {
 // X: After a user presses enter, the screen and keyboard should freeze for 10 seconds and then go to the next trial.
   // TODO: Do we also need to disable mouse click events?
   // Also, should we give the user some sort of UI update so they know something's happening?
+// X: Only show image once page loads so you don't see it big and then small again.
 // TODO: Set focus on the image once page loads so that spacebar press will always enhance image
-// TODO: Only show image once page loads so you don't see it big and then small again.
 
-// FLOW
+// SESSION FLOW
 // 1. Present instructions page
 // 2. Present two practice trials (with generic photo)
 // 2. Present each at random (16 pictures, shown 4 times each)
@@ -110,7 +110,6 @@ Qualtrics.SurveyEngine.addOnReady(function() {
 // How do we get JS into every questions
 // Do pictures need to be resized to consistent size?
 // How should we output data?
-// Should we hide image until OnReady?
 
 // MODIFIABLE CONFIGS
 // Instructions
@@ -122,7 +121,7 @@ Qualtrics.SurveyEngine.addOnReady(function() {
 
 // OUTPUT DATA for given trial (added as embedded data)
 // 1. picture ID
-// 2. trial order (order photo was shown)
+// 2. trial order (order photo was shown, aka question number?)
 // 4. reaction time of keypress (in ms) -- ms from last keypress?
 // 3. number of presses for picture
 // 5. total time from initial presentation to user enter press event
