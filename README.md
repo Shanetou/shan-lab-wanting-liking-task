@@ -1,2 +1,2 @@
-# shan-lab-warmth-amygdala-task
-Warmth amygdala task for the SHAN Lab
+# shan-lab-wanting-liking-task
+Wanting-liking task for the SHAN Lab
